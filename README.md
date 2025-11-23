@@ -126,7 +126,7 @@ FoodReceipt_AI/
 │   │   │   ├── vector_db.pkl        # FAISS vector store
 │   │   │   └── vector_service.py    # Vector search
 │   │   ├── services/
-│   │   │   ├── agenti.py            # LangGraph agent
+│   │   │   ├── agentic_ai_v2.py            # LangGraph agent
 │   │   │   ├── llm_service_openrouter.py  # LLM integration
 │   │   │   ├── ocr_service.py       # EasyOCR service
 │   │   │   └── receipt_ingestion.py # Receipt processor
