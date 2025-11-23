@@ -1,7 +1,10 @@
 # src/backend/app/db/init_db.py
 import sqlite3
+import os
+DB_PATH = "/app/src/backend/app/db/receipts.db"
+os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
 
-def init_sqlite_db(db_path="receipts.db"):
+def init_sqlite_db(db_path=DB_PATH):
     """
     Initialize the SQLite receipts database.
     """

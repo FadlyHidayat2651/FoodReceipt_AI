@@ -2,6 +2,8 @@
 import os
 from vector_service import VectorService
 
+DB_PATH = "/app/src/backend/app/db/vector_db.pkl"
+os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
 def init_vector_db(db_path="vector_db.pkl", embedding_model="all-MiniLM-L6-v2"):
     """
     Initialize vector DB (pickle file) using VectorService.

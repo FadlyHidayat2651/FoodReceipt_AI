@@ -41,6 +41,15 @@ Get API key from: https://openrouter.ai/
 ### 3. Run
 
 ```bash
+# Initialize Docker Image
+docker build -t food_receipt .
+
+# Docker Run 
+docker run -d \               
+  --env-file .env \
+  -p 8114:8114 -p 3000:3000 \
+  food_receipt
+
 # Start application
 docker-compose up -d
 
@@ -67,6 +76,17 @@ SQLite DB and VectorDB initialized successfully in /app/src/backend/app/db.
  * Debug mode: on
 ```
 If it is not complete then you cant use the service
+
+Also, The first time you try to upload receipt, it will need to download the model first always check the logs via
+
+``` 
+docker ps -a
+```
+Get the ID and run 
+```
+docker logs <container ID>
+```
+to check the process
 
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:8114

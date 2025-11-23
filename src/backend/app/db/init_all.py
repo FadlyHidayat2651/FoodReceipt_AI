@@ -6,14 +6,15 @@ from sentence_transformers import SentenceTransformer
 
 if __name__ == "__main__":
     # Get the folder of this script
-    base_dir = os.path.dirname(os.path.abspath(__file__))
+    DB_DIR = "/app/src/backend/app/db"
+    os.makedirs(DB_DIR, exist_ok=True)
 
     # ---------------- SQLite DB ----------------
-    SQLITE_DB_PATH = os.path.join(base_dir, "receipts.db")
+    SQLITE_DB_PATH = os.path.join(DB_DIR, "receipts.db")
     init_sqlite_db(db_path=SQLITE_DB_PATH)
 
     # ---------------- Vector DB ----------------
-    VECTOR_DB_PATH = os.path.join(base_dir, "vector_db.pkl")
+    VECTOR_DB_PATH = os.path.join(DB_DIR, "vector_db.pkl")
     init_vector_db(db_path=VECTOR_DB_PATH)
 
     # ---------------- Embedding Model ----------------
@@ -21,4 +22,4 @@ if __name__ == "__main__":
     embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
     print("SentenceTransformer model loaded and ready.")
 
-    print(f"SQLite DB and VectorDB initialized successfully in {base_dir}.")
+    print(f"SQLite DB and VectorDB initialized successfully in {DB_DIR}.")

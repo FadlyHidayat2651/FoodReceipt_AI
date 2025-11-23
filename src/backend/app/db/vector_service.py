@@ -3,13 +3,17 @@ import os
 import pickle
 import numpy as np
 from sentence_transformers import SentenceTransformer
+import os
+
+DB_DIR = "/app/src/backend/app/db"
+VECTOR_PATH = os.path.join(DB_DIR, "vector_db.pkl")
 
 class VectorService:
     """
     Combined embedding generator + manual vector DB using numpy.
     Supports preloaded embedding model.
     """
-    def __init__(self, db_path="vector_db.pkl", embedding_model="all-MiniLM-L6-v2", model=None):
+    def __init__(self, db_path=VECTOR_PATH , embedding_model="all-MiniLM-L6-v2", model=None):
         self.db_path = db_path
         self.model = model or SentenceTransformer(embedding_model)
         

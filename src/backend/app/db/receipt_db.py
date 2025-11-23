@@ -2,12 +2,16 @@
 import sqlite3
 import json
 from db.vector_service import VectorService
+import os
+
+DB_DIR = "/app/src/backend/app/db"
+RECEIPT_PATH = os.path.join(DB_DIR, "receipts.db")
 
 class ReceiptDB:
     """
     Handles SQLite receipt storage and optional embedding generation.
     """
-    def __init__(self, db_path="receipts.db", vector_service: VectorService = None):
+    def __init__(self, db_path=RECEIPT_PATH, vector_service: VectorService = None):
         self.db_path = db_path
         self.vector_service = vector_service
         self.conn = sqlite3.connect(self.db_path)

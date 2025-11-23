@@ -1,5 +1,6 @@
 FROM python:3.11
 
+# Set working directory
 WORKDIR /app
 
 # Install system dependencies
@@ -8,24 +9,24 @@ RUN apt-get update && apt-get install -y \
     libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements and install Python dependencies
+# Copy requirements and install dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
 COPY src/ ./src/
 
-# Create DB directory
-RUN mkdir -p src/backend/app/db
+# Make sure DB directory exists inside container
+RUN mkdir -p /app/src/backend/app/db
 
-# Environment variables
+# Set environment variables
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONPATH=/app
 
-# Expose ports
+# Expose backend + frontend ports
 EXPOSE 8114 3000
 
-# Run backend and frontend
-CMD bash -c "python src/backend/app/db/init_all.py && \
-             python src/backend/app/main.py & \
-             python -m http.server 3000 --directory src/frontend"
+# Run backend then frontend (absolute paths)
+CMD bash -c "python /app/src/backend/app/db/init_all.py && \
+             python /app/src/backend/app/main.py & \
+             python -m http.server 3000 --directory /app/src/frontend"
