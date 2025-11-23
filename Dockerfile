@@ -1,18 +1,15 @@
-FROM python:3.11-slim
+FROM python:3.11
 
-# Set working directory
 WORKDIR /app
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
-    libgl1-mesa-glx \
+    libgl1 \
     libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements
+# Copy requirements and install Python dependencies
 COPY requirements.txt .
-
-# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
@@ -21,12 +18,14 @@ COPY src/ ./src/
 # Create DB directory
 RUN mkdir -p src/backend/app/db
 
-# Set environment variables
+# Environment variables
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONPATH=/app
 
-# Expose ports (8114 for API, 3000 for frontend)
+# Expose ports
 EXPOSE 8114 3000
 
-# Run both backend and serve frontend
-CMD python src/backend/app/main.py & python -m http.server 3000 --directory src/frontend
+# Run backend and frontend
+CMD bash -c "python src/backend/app/db/init_all.py && \
+             python src/backend/app/main.py & \
+             python -m http.server 3000 --directory src/frontend"
