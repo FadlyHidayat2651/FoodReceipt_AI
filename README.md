@@ -63,7 +63,7 @@ docker-compose down
 1. **OCR Service** - Extracts text from receipt images using EasyOCR
 2. **Database** 
    - SQLite: Stores receipt data (vendor, date, items, total)
-   - Vector DB: Enables semantic search using FAISS
+   - Vector DB: Semantic Using Numpy Arrays to do Cosine Similarity
 3. **AI Agent** - LangGraph powers intelligent question answering
 4. **API** - Flask REST API for frontend communication
 
@@ -123,7 +123,7 @@ FoodReceipt_AI/
 │   │   │   ├── init_vector_db.py    # Vector DB setup
 │   │   │   ├── receipt_db.py        # SQLite operations
 │   │   │   ├── receipts.db          # SQLite database
-│   │   │   ├── vector_db.pkl        # FAISS vector store
+│   │   │   ├── vector_db.pkl        # Vector store
 │   │   │   └── vector_service.py    # Vector search
 │   │   ├── services/
 │   │   │   ├── agentic_ai_v2.py            # LangGraph agent
@@ -144,7 +144,7 @@ FoodReceipt_AI/
 ## 🛠️ Tech Stack
 
 - Python 3.11, Flask, LangGraph
-- EasyOCR, FAISS, SQLite
+- EasyOCR, SQLite
 - Docker, GitHub Actions
 
 ---
