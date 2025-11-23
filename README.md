@@ -52,6 +52,21 @@ docker-compose down
 ```
 
 ### 4. Access
+CAUTIONS! Make sure to always wait until all initialization complete
+```
+Serving HTTP on 0.0.0.0 port 3000 (http://0.0.0.0:3000/) ...
+192.168.65.1 - - [23/Nov/2025 15:44:34] "GET / HTTP/1.1" 304 -
+SQLite DB initialized: /app/src/backend/app/db/receipts.db
+Vector DB already exists at /app/src/backend/app/db/vector_db.pkl
+Loading embedding model...
+SentenceTransformer model loaded and ready.
+Initializing embedding model...
+SentenceTransformer model loaded and ready.
+SQLite DB and VectorDB initialized successfully in /app/src/backend/app/db.
+ * Serving Flask app 'main'
+ * Debug mode: on
+```
+If it is not complete then you cant use the service
 
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:8114
