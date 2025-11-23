@@ -71,7 +71,7 @@ class ReceiptQnAAgent:
         print(f"\n=== Search Params ===\n{answer}\n")
         return state
     
-    def search_receipts(self, query: str, top_k: int = 10) -> List[dict]:
+    def search_receipts(self, query: str, top_k: int = 4) -> List[dict]:
         """
         Search receipts by a free-text query using vector similarity
         
@@ -139,10 +139,19 @@ class ReceiptQnAAgent:
         new_messages  = [f"Question: {query} Answer: {answer}"]
         print("\n=== State Messages ===")
         print(state["messages"])
+        # Trim to last 5 messages
+        updated_messages = (state.get("messages") or []) + new_messages
+        MAX_MESSAGES = 5
+        if len(updated_messages) > MAX_MESSAGES:
+            updated_messages = updated_messages[-MAX_MESSAGES:]
+
+        print("\n=== State Messages ===")
+        print(updated_messages)
+
         return {
-                "answer": answer,
-                "messages": new_messages  # just the new message
-            }
+            "answer": answer,
+            "messages": updated_messages
+        }
             
     def _build_graph(self) -> StateGraph:
         """Build and compile the LangGraph agent"""
