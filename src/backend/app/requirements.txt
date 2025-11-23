@@ -1,0 +1,12 @@
+numpy
+docling 
+pillow
+langchain_core
+easyocr
+pillow
+langchain_openai
+psycopg2-binary
+sentence-transformers
+langgraph
+flask
+flask-cors

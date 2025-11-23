@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receipt QnA Chatbot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 800px;
+            height: 90vh;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .chat-header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .chat-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.bot {
+            justify-content: flex-start;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            word-wrap: break-word;
+        }
+
+        .message.bot .message-content {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.user .message-content {
+            background: #667eea;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message-content pre {
+            white-space: pre-wrap;
+            font-family: inherit;
+            margin: 0;
+        }
+
+        .receipt-preview {
+            max-width: 200px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .chat-input-area {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .upload-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .upload-btn {
+            flex: 1;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .upload-btn:hover {
+            background: #5568d3;
+        }
+
+        .upload-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 24px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .chat-input:focus {
+            border-color: #667eea;
+        }
+
+        .chat-input:disabled {
+            background: #f5f5f5;
+            cursor: not-allowed;
+        }
+
+        .send-btn {
+            width: 50px;
+            height: 50px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .send-btn:hover {
+            background: #5568d3;
+            transform: scale(1.05);
+        }
+
+        .send-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: scale(1);
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 5px;
+            padding: 12px 16px;
+        }
+
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            background: #999;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes bounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .status-text {
+            font-size: 12px;
+            color: #999;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .receipt-data {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            margin-top: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>🧾 Receipt QnA Chatbot</h1>
+            <p>Upload your receipt and ask questions</p>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot">
+                <div class="message-content">
+                    <pre>Hi! Selamat Datang! Silakanya tanyakan transaksi mu terdahulu atau masukan resi baru!</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-input-area">
+            <div class="status-text" id="statusText"></div>
+            
+            <div class="upload-section">
+                <input type="file" id="fileInput" class="file-input" accept="image/*">
+                <button class="upload-btn" id="uploadBtn" onclick="document.getElementById('fileInput').click()">
+                    📤 Upload Receipt
+                </button>
+                <button class="upload-btn" id="processBtn" onclick="processReceipt()" disabled>
+                    ⚙️ Process Receipt
+                </button>
+            </div>
+
+            <div class="input-container">
+                <input 
+                    type="text" 
+                    class="chat-input" 
+                    id="chatInput" 
+                    placeholder="Ask a question about your receipts..."
+                >
+                <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+                    ➤
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8114';
+        let uploadedFile = null;
+        let savedFilePath = null;
+        let isProcessing = false;
+
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const fileInput = document.getElementById('fileInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const processBtn = document.getElementById('processBtn');
+        const sendBtn = document.getElementById('sendBtn');
+        const statusText = document.getElementById('statusText');
+
+        // Add bot message
+        function addBotMessage(text, imageUrl = null, receiptData = null) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message bot';
+            
+            // Parse and clean the text
+            let cleanedText = parseMarkdown(text);
+            
+            let content = `<div style="line-height: 1.6;">${cleanedText}</div>`;
+            
+            if (imageUrl) {
+                content += `<img src="${imageUrl}" class="receipt-preview" alt="Receipt">`;
+            }
+            
+            if (receiptData) {
+                content += `<div class="receipt-data">${JSON.stringify(receiptData, null, 2)}</div>`;
+            }
+            
+            messageDiv.innerHTML = `<div class="message-content">${content}</div>`;
+            chatMessages.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        // Parse markdown-like formatting
+        function parseMarkdown(text) {
+            // Replace unicode characters
+            text = text.replace(/\u2011/g, '-');  // Non-breaking hyphen
+            text = text.replace(/\u202f/g, ' ');  // Narrow no-break space
+            text = text.replace(/\u2013/g, '-');  // En dash
+            text = text.replace(/\u2014/g, '-');  // Em dash
+            
+            // Parse tables (markdown format)
+            text = parseTable(text);
+            
+            // Convert **bold** to <strong>
+            text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+            
+            // Convert - bullet points to •
+            text = text.replace(/^- /gm, '• ');
+            
+            // Convert newlines to <br>
+            text = text.replace(/\n/g, '<br>');
+            
+            // Convert numbers with dots (1. 2. 3.) to styled list items
+            text = text.replace(/^(\d+)\. /gm, '<span style="color: #667eea; font-weight: 600;">$1.</span> ');
+            
+            return text;
+        }
+
+        // Parse markdown tables
+        function parseTable(text) {
+            // Match markdown table pattern
+            const tableRegex = /\|(.+)\|[\r\n]+\|[-:\s|]+\|[\r\n]+((?:\|.+\|[\r\n]*)+)/g;
+            
+            return text.replace(tableRegex, (match, headerRow, bodyRows) => {
+                // Parse header
+                const headers = headerRow.split('|').map(h => h.trim()).filter(h => h);
+                
+                // Parse body rows
+                const rows = bodyRows.trim().split('\n').map(row => {
+                    return row.split('|').map(cell => cell.trim()).filter(cell => cell);
+                });
+                
+                // Build HTML table
+                let html = '<table style="border-collapse: collapse; margin: 10px 0; width: 100%; font-size: 14px;">';
+                
+                // Header
+                html += '<thead><tr>';
+                headers.forEach(header => {
+                    html += `<th style="border: 1px solid #ddd; padding: 8px; background: #667eea; color: white; text-align: left;">${header}</th>`;
+                });
+                html += '</tr></thead>';
+                
+                // Body
+                html += '<tbody>';
+                rows.forEach(row => {
+                    html += '<tr>';
+                    row.forEach(cell => {
+                        html += `<td style="border: 1px solid #ddd; padding: 8px;">${cell}</td>`;
+                    });
+                    html += '</tr>';
+                });
+                html += '</tbody>';
+                
+                html += '</table>';
+                return html;
+            });
+        }
+
+        // Add user message
+        function addUserMessage(text) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message user';
+            messageDiv.innerHTML = `<div class="message-content"><pre>${text}</pre></div>`;
+            chatMessages.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        // Add typing indicator
+        function showTyping() {
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message bot';
+            typingDiv.id = 'typingIndicator';
+            typingDiv.innerHTML = `
+                <div class="message-content typing-indicator">
+                    <span></span><span></span><span></span>
+                </div>
+            `;
+            chatMessages.appendChild(typingDiv);
+            scrollToBottom();
+        }
+
+        function hideTyping() {
+            const typing = document.getElementById('typingIndicator');
+            if (typing) typing.remove();
+        }
+
+        function scrollToBottom() {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Handle file upload
+        fileInput.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                uploadedFile = file;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    addBotMessage('Receipt uploaded! Click "Process Receipt" to analyze it.', e.target.result);
+                    processBtn.disabled = false;
+                    statusText.textContent = '✓ Receipt uploaded';
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+
+        // Process receipt
+        async function processReceipt() {
+            if (!uploadedFile || isProcessing) return;
+
+            isProcessing = true;
+            processBtn.disabled = true;
+            uploadBtn.disabled = true;
+            showTyping();
+            statusText.textContent = 'Processing receipt...';
+
+            try {
+                // Convert to base64
+                const base64 = await fileToBase64(uploadedFile);
+
+                // Send base64 directly to process endpoint
+                const processResponse = await fetch(`${API_BASE_URL}/api/process`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        base64_image: base64
+                    })
+                });
+
+                const processData = await processResponse.json();
+                if (processData.error) throw new Error(processData.error);
+
+                hideTyping();
+                addBotMessage(processData.message || 'Receipt processed successfully!');
+
+                statusText.textContent = '✓ Receipt saved to database';
+                processBtn.disabled = false;
+                uploadBtn.disabled = false;
+
+            } catch (error) {
+                hideTyping();
+                addBotMessage(`Error: ${error.message}`);
+                statusText.textContent = '✗ Processing failed';
+                processBtn.disabled = false;
+                uploadBtn.disabled = false;
+            } finally {
+                isProcessing = false;
+            }
+        }
+
+        // Send message
+        async function sendMessage() {
+            const question = chatInput.value.trim();
+            if (!question || isProcessing) return;
+
+            addUserMessage(question);
+            chatInput.value = '';
+            showTyping();
+            isProcessing = true;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/query`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question })
+                });
+
+                const data = await response.json();
+                if (data.error) throw new Error(data.error);
+
+                hideTyping();
+                addBotMessage(data.answer);
+
+            } catch (error) {
+                hideTyping();
+                addBotMessage(`Error: ${error.message}`);
+            } finally {
+                chatInput.focus();
+                isProcessing = false;
+            }
+        }
+
+        // Helper function
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Enter to send
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !isProcessing) {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
